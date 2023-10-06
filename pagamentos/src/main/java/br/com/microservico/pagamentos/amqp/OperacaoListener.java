@@ -8,7 +8,7 @@ import br.com.microservico.pagamentos.dto.OperacaoResponse;
 
 @Component
 public class OperacaoListener {
-	@RabbitListener(queues = "operacao.realizada")
+	//@RabbitListener(queues = "operacao.realizada")
     public void recebeMensagem(@Payload OperacaoResponse operacao) {
         String mensagem = """ 
                 Codigo da operacao: %s

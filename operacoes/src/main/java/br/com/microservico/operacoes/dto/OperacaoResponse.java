@@ -1,6 +1,5 @@
 package br.com.microservico.operacoes.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,6 +23,6 @@ public class OperacaoResponse{
 	private Status statusOperacao;
 	private Integer codigoOperacao;
 	private Integer quantidadeTitulos;
-	private BigDecimal valorOperacao;
+	private Double valorOperacao;
 
 }

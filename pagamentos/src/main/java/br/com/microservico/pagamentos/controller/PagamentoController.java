@@ -6,6 +6,7 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import br.com.microservico.pagamentos.dto.PagamentoOperacaoRequest;
 import br.com.microservico.pagamentos.dto.PagamentoResponse;
 import br.com.microservico.pagamentos.model.Status;
+import br.com.microservico.pagamentos.model.StatusPagamento;
 import br.com.microservico.pagamentos.service.PagamentoService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,8 @@ public class PagamentoController {
 
 	@Autowired
     private PagamentoService service;
+	@Autowired
+	private ModelMapper modelMapper;
     
 
     @GetMapping(path = "/listar")
@@ -57,7 +61,8 @@ public class PagamentoController {
 
     @PutMapping("/atualizar/status/{opeCodigo}")
     @ApiOperation(value = "Endpoint responsável por atualizar status dos pagamentos")
-    public ResponseEntity<PagamentoResponse> atualizarStatus(@PathVariable @NotNull Integer opeCodigo, @RequestParam Status status) {
+    public ResponseEntity<PagamentoResponse> atualizarStatus(@PathVariable @NotNull Integer opeCodigo, @RequestParam StatusPagamento statusPagamento) {
+    	Status status = modelMapper.map(statusPagamento, Status.class);
         return service.atualizarStatusPagamento(opeCodigo, status);
     }
 

@@ -1,6 +1,5 @@
 package br.com.microservico.pagamentos.model;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
@@ -13,7 +12,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.br.CNPJ;
 
@@ -36,10 +34,9 @@ public class Pagamento {
 
     @NotNull
     @Positive
-    private BigDecimal valorRecebido;
+    private Double valorRecebido;
 
     @NotBlank
-    @Size(max=14)
     @CNPJ
     private String identificadorSacado;
 
@@ -52,7 +49,7 @@ public class Pagamento {
     
     @NotNull
     @Positive
-    private BigDecimal valorOriginal;
+    private Double valorOriginal;
     
     @NotNull
 	private LocalDateTime dataCriacao;

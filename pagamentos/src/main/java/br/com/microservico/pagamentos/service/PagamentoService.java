@@ -1,6 +1,5 @@
 package br.com.microservico.pagamentos.service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -60,18 +59,20 @@ public class PagamentoService {
 				.dataAtualizacao(null)
 				.dataCriacao(LocalDateTime.now())
 				.identificadorSacado(pagamentoDTO.getIdentificadorSacado())
-				.status(validarStatus(pagamentoDTO.getValorAPagar(),operacao.getValorOperacao()))
+				.status(validarStatus(operacao.getValorOperacao(),pagamentoDTO.getValorAPagar()))
 				.valorOriginal(operacao.getValorOperacao())
 				.valorRecebido(pagamentoDTO.getValorAPagar())
 				.build());
 		OperacaoResponse operacaoResponse = modelMapper.map(pagamento, OperacaoResponse.class);
 
-		if (validarStatus(pagamentoDTO.getValorAPagar(),operacao.getValorOperacao()).equals(Status.CONCLUIDO)) {
+		if (validarStatus(operacao.getValorOperacao(),pagamentoDTO.getValorAPagar()).equals(Status.CONCLUIDO)) {
 			operacaoClient.atualizaStatus(operacao.getCodigoOperacao(), Status.PAGA);
 			rabbitTemplate.convertAndSend("operacoes.finalizadas", operacaoResponse);
-		} else if (validarStatus(pagamentoDTO.getValorAPagar(),operacao.getValorOperacao()).equals(Status.PARCIAL)) {
+			rabbitTemplate.convertAndSend("pagamentos.finalizados", operacaoResponse);
+		} else if (validarStatus(operacao.getValorOperacao(),pagamentoDTO.getValorAPagar()).equals(Status.PARCIAL)) {
 			operacaoClient.atualizaStatus(operacao.getCodigoOperacao(), Status.PAGA_PARCIALMENTE);
 			rabbitTemplate.convertAndSend("operacoes.paga-parcialmente", operacaoResponse);
+			rabbitTemplate.convertAndSend("pagamentos.parciais", operacaoResponse);
 		}
 
 		return PagamentoResponse.builder()
@@ -85,13 +86,13 @@ public class PagamentoService {
 				.build();
 	}
 
-	private Status validarStatus(BigDecimal valorOriginal, BigDecimal valorPago) {
+	private Status validarStatus(Double valorOriginal, Double valorPago) {
 		if (valorPago.equals(valorOriginal)) {
 			return Status.CONCLUIDO;
-		} else if (valorPago.compareTo(valorOriginal) == -1) {
+		} else if (valorPago < valorOriginal) {
 			return Status.PARCIAL;
 		}
-		return null;
+		throw new RuntimeException("Valor ao tentar pagar excedente ao valor pendente.");
 	}
 
 	public OperacaoResponse atualizarPagamento(Long id, PagamentoOperacaoRequest dto) {
@@ -144,15 +145,19 @@ public class PagamentoService {
 			if(status.equals(Status.EXCLUIDO)) {
 				operacaoClient.atualizaStatus(opeCodigo, Status.EXCLUIDA);
 				rabbitTemplate.convertAndSend("pagamentos.recusados",pagamentoResponse);
+				rabbitTemplate.convertAndSend("operacao.recusadas", pagamentoResponse);
 			}else if(status.equals(Status.CONCLUIDO)) {
 				operacaoClient.atualizaStatus(opeCodigo, Status.PAGA);
 				rabbitTemplate.convertAndSend("pagamentos.finalizados", pagamentoResponse);
+				rabbitTemplate.convertAndSend("operacoes.finalizadas", pagamentoResponse);
 			}else if(status.equals(Status.PAGA_PARCIALMENTE)) {
 				operacaoClient.atualizaStatus(opeCodigo, Status.PAGA_PARCIALMENTE);
+				rabbitTemplate.convertAndSend("operacoes.paga-parcialmente", pagamentoResponse);
 				rabbitTemplate.convertAndSend("pagamentos.parciais", pagamentoResponse);
 			}else if(status.equals(Status.REJEITADO)) {
 				operacaoClient.atualizaStatus(opeCodigo, Status.RECUSADA);
 				rabbitTemplate.convertAndSend("pagamentos.recusados", pagamentoResponse);
+				rabbitTemplate.convertAndSend("operacao.recusadas", pagamentoResponse);
 			}
 			
 			return ResponseEntity.ok(pagamentoResponse);

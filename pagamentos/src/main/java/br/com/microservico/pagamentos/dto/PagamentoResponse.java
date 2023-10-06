@@ -1,6 +1,5 @@
 package br.com.microservico.pagamentos.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import br.com.microservico.pagamentos.model.Status;
@@ -15,11 +14,11 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PagamentoResponse {
 	
-	    private BigDecimal valorRecebido;
+	    private Double valorRecebido;
 	    private String identificadorSacado;
 	    private Status status;
 	    private Integer codigoOperacao;
-	    private BigDecimal valorOriginal;
+	    private Double valorOriginal;
 		private LocalDateTime dataCriacao;
 		private LocalDateTime dataAtualizacao;
 

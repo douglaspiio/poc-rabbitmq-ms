@@ -1,6 +1,5 @@
 package br.com.microservico.operacoes.model;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
@@ -39,5 +38,5 @@ public class Operacao {
 	@NotNull
 	private Integer quantidadeTitulos;
 	@NotNull
-	private BigDecimal valorOperacao;
+	private Double valorOperacao;
 }

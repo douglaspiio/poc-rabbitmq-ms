@@ -1,7 +1,5 @@
 package br.com.microservico.operacoes.dto;
 
-import java.math.BigDecimal;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -15,7 +13,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(value = Include.NON_NULL)
 public class OperacaoRequest {
 
-    private BigDecimal valor;
+    private Double valor;
     private Integer quantidadeTitulos;
 
 }
