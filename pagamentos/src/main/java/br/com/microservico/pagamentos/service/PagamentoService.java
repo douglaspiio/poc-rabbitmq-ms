@@ -45,7 +45,7 @@ public class PagamentoService {
 
 	public PagamentoResponse criarPagamento(PagamentoOperacaoRequest pagamentoDTO) {
 		
-		rabbitTemplate.convertAndSend("pagamento.operacao", pagamentoDTO);
+		rabbitTemplate.convertAndSend("pagamentos.operacao", pagamentoDTO);
 		
 		OperacaoResponse operacao = operacaoClient.listarPorOpeCodigo(pagamentoDTO.getCodigoOperacao()).getBody();
 		Pagamento pagamento = modelMapper.map(pagamentoDTO, Pagamento.class);

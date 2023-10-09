@@ -71,5 +71,12 @@ public class PagamentoAMQPConfiguration {
 //    public FanoutExchange fanoutExchange(){
 //        return new FanoutExchange("pagamentos.ex");
 //    }
+    
+//    @Bean
+//    public Binding juncaoFilas() {
+//    	return BindingBuilder
+//    			.bind("nomeFila")
+//    			.to("paraQualExchange");
+//    }
 
 }
